@@ -36,10 +36,10 @@ class Hoteis(Resource):
 
 class Hotel(Resource):
     argumentos = reqparse.RequestParser()
-    argumentos.add_argument('nome')
-    argumentos.add_argument('estrelas')
-    argumentos.add_argument('diaria')
-    argumentos.add_argument('cidade')
+    argumentos.add_argument('nome', type=str, required=True, help="The field 'nome' cannot be left blank.")
+    argumentos.add_argument('estrelas', type=float, required=True, help="The field 'estrelas' cannot be left blank.")
+    argumentos.add_argument('diaria', type=float, required=True, help="The field 'diaria' cannot be left blank.")
+    argumentos.add_argument('cidade', type=str, required=True, help="The field 'cidade' cannot be left blank.")
 
     def get(self, hotel_id):
         hotel = HotelModel.find(hotel_id)
@@ -55,26 +55,36 @@ class Hotel(Resource):
 
         dados = Hotel.argumentos.parse_args()
         novo_hotel = HotelModel(hotel_id, **dados) #implementando o **kwargs, distribuindo as propriedades de chave e valor pelo objeto
-        novo_hotel.save()
+        try:
+            novo_hotel.save()
+        except:
+            return {'message':'An internal error ocurred trying to update hotel.'}, 500
 
         return novo_hotel.json(), 200
 
     def put(self, hotel_id):
         hotel_encontrado = HotelModel.find(hotel_id)
         dados = Hotel.argumentos.parse_args()
+        try:
+            if hotel_encontrado:
+                hotel_encontrado.update(**dados)
+                hotel_encontrado.save()
+                return hotel_encontrado.json(), 200
 
-        if hotel_encontrado:
-            hotel_encontrado.update(**dados)
-            hotel_encontrado.save()
-            return hotel_encontrado.json(), 200
+            novo_hotel = HotelModel(hotel_id, **dados)
+            novo_hotel.save()
+        except:
+            return {'message':'An internal error ocurred trying to save "hotel".'}, 500
 
-        novo_hotel = HotelModel(hotel_id, **dados)
-        novo_hotel.save()
         return novo_hotel.json(), 201
 
     def delete(self, hotel_id):
         hotel_encontrado = HotelModel.find(hotel_id)
         if hotel_encontrado:
-            hotel_encontrado.delete()
-            return {'message': 'Hotel deleted.'}
+            try:
+                hotel_encontrado.delete()
+                return {'message': 'Hotel deleted.'}
+            except:
+                return {'message':'An internal error ocurred trying to delete "hotel".'}, 500
+
         return {'message': 'Hotel not found.'}, 404
