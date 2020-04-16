@@ -28,7 +28,11 @@ hoteis =[
 class Hoteis(Resource):
 
     def get(self):
-        return {'hoteis': hoteis}
+        hoteis = HotelModel.find_all()
+
+        return [hotel.json() for hotel in hoteis if hoteis is not None]
+
+        return {'message': 'Hotel not found.'}, 404
 
 class Hotel(Resource):
     argumentos = reqparse.RequestParser()
@@ -38,10 +42,10 @@ class Hotel(Resource):
     argumentos.add_argument('cidade')
 
     def get(self, hotel_id):
-        hotel = Hotel.find(hotel_id)
+        hotel = HotelModel.find(hotel_id)
 
         if hotel:
-            return hotel
+            return hotel.json()
 
         return {'message': 'Hotel not found.'}, 404
 
@@ -59,7 +63,7 @@ class Hotel(Resource):
         dados = Hotel.argumentos.parse_args()
         novo_hotel = HotelModel(hotel_id, **dados) 
 
-        hotel = Hotel.find(hotel_id)
+        hotel = HotelModel.find(hotel_id)
         json = novo_hotel.json()
 
         if hotel:

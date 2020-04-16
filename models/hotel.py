@@ -31,6 +31,11 @@ class HotelModel(banco.Model):
         hotel = cls.query.filter_by(hotel_id=hotel_id).first()
         return hotel if hotel else None
 
+    @classmethod
+    def find_all(cls):
+        hoteis = cls.query.all()
+        return hoteis if hoteis else None
+
     def save(self):
         banco.session.add(self)
         banco.session.commit()
