@@ -1,4 +1,5 @@
 from flask_restful import Resource, reqparse
+from models.hotel import HotelModel
 
 hoteis =[
         {
@@ -53,22 +54,26 @@ class Hotel(Resource):
 
         dados = Hotel.argumentos.parse_args()
 
-        novo_hotel = { 'hotel_id': hotel_id, **dados }
+        novo_hotel = HotelModel(hotel_id, **dados) 
+        json = novo_hotel.json()
 
-        hoteis.append(novo_hotel)
-        return novo_hotel, 200
+        hoteis.append(json)
+        return json, 200
 
     def put(self, hotel_id):
         dados = Hotel.argumentos.parse_args()
-        novo_hotel = { 'hotel_id': hotel_id, **dados }
+        novo_hotel = HotelModel(hotel_id, **dados) #implementando o **kwargs, distribuindo as propriedades de chave e valor pelo objeto
 
         hotel = Hotel.find_hotel(hotel_id)
+        json = novo_hotel.json()
 
         if hotel:
-            hotel.update(novo_hotel)
-            return novo_hotel, 200
-        hoteis.append(novo_hotel)
-        return novo_hotel, 201
+            hotel.update(json)
+            return json, 200
+        hoteis.append(json)
+        returnjson, 201
 
     def delete(self, hotel_id):
-        pass
+        global hoteis #indica pro python que a lista abaixo nao é nova, mas sim a lista da classe
+        hoteis = [hotel for hotel in hoteis if hotel['hotel_id'] != hotel_id]
+        return {'message': 'Hotel deleted.'}
