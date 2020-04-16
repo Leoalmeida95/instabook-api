@@ -30,7 +30,7 @@ class Hoteis(Resource):
     def get(self):
         hoteis = HotelModel.find_all()
 
-        return [hotel.json() for hotel in hoteis if hoteis is not None]
+        return {'hoteis': [ hotel.json() for hotel in hoteis if hoteis is not None ]}
 
         return {'message': 'Hotel not found.'}, 404
 
@@ -73,6 +73,8 @@ class Hotel(Resource):
         return novo_hotel.json(), 201
 
     def delete(self, hotel_id):
-        global hoteis #indica pro python que a lista abaixo nao é nova, mas sim a lista da classe
-        hoteis = [hotel for hotel in hoteis if hotel['hotel_id'] != hotel_id]
-        return {'message': 'Hotel deleted.'}
+        hotel_encontrado = HotelModel.find(hotel_id)
+        if hotel_encontrado:
+            hotel_encontrado.delete()
+            return {'message': 'Hotel deleted.'}
+        return {'message': 'Hotel not found.'}, 404
