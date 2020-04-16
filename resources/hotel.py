@@ -60,18 +60,17 @@ class Hotel(Resource):
         return novo_hotel.json(), 200
 
     def put(self, hotel_id):
+        hotel_encontrado = HotelModel.find(hotel_id)
         dados = Hotel.argumentos.parse_args()
-        novo_hotel = HotelModel(hotel_id, **dados) 
 
-        hotel = HotelModel.find(hotel_id)
-        json = novo_hotel.json()
+        if hotel_encontrado:
+            hotel_encontrado.update(**dados)
+            hotel_encontrado.save()
+            return hotel_encontrado.json(), 200
 
-        if hotel:
-            hotel.update(json)
-            return json, 200
-
-        hoteis.append(json)
-        return json, 201
+        novo_hotel = HotelModel(hotel_id, **dados)
+        novo_hotel.save()
+        return novo_hotel.json(), 201
 
     def delete(self, hotel_id):
         global hoteis #indica pro python que a lista abaixo nao é nova, mas sim a lista da classe
