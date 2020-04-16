@@ -37,41 +37,37 @@ class Hotel(Resource):
     argumentos.add_argument('diaria')
     argumentos.add_argument('cidade')
 
-    def find_hotel(hotel_id):
-        for hotel in hoteis:
-            if hotel['hotel_id'] == hotel_id:
-                return hotel
-        return None
-
     def get(self, hotel_id):
-        hotel = Hotel.find_hotel(hotel_id)
+        hotel = Hotel.find(hotel_id)
+
         if hotel:
             return hotel
 
         return {'message': 'Hotel not found.'}, 404
 
     def post(self, hotel_id):
+        if HotelModel.find(hotel_id):
+            return{"message":"Hotel id '{}' already exists.".format(hotel_id)}, 400
 
         dados = Hotel.argumentos.parse_args()
+        novo_hotel = HotelModel(hotel_id, **dados) #implementando o **kwargs, distribuindo as propriedades de chave e valor pelo objeto
+        novo_hotel.save()
 
-        novo_hotel = HotelModel(hotel_id, **dados) 
-        json = novo_hotel.json()
-
-        hoteis.append(json)
-        return json, 200
+        return novo_hotel.json(), 200
 
     def put(self, hotel_id):
         dados = Hotel.argumentos.parse_args()
-        novo_hotel = HotelModel(hotel_id, **dados) #implementando o **kwargs, distribuindo as propriedades de chave e valor pelo objeto
+        novo_hotel = HotelModel(hotel_id, **dados) 
 
-        hotel = Hotel.find_hotel(hotel_id)
+        hotel = Hotel.find(hotel_id)
         json = novo_hotel.json()
 
         if hotel:
             hotel.update(json)
             return json, 200
+
         hoteis.append(json)
-        returnjson, 201
+        return json, 201
 
     def delete(self, hotel_id):
         global hoteis #indica pro python que a lista abaixo nao é nova, mas sim a lista da classe

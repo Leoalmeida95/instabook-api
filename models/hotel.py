@@ -24,3 +24,13 @@ class HotelModel(banco.Model):
             'diaria': self.diaria,
             'cidade': self.cidade
         }
+
+    #cls define que o método é um 'método de classe', portanto não acessa as propriedades self
+    @classmethod
+    def find(cls, hotel_id):
+        hotel = cls.query.filter_by(hotel_id=hotel_id).first()
+        return hotel if hotel else None
+
+    def save(self):
+        banco.session.add(self)
+        banco.session.commit()
