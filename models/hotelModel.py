@@ -34,7 +34,7 @@ class HotelModel(banco.Model):
     @classmethod
     def find_all(cls):
         hoteis = cls.query.all()
-        return hoteis if hoteis else None
+        return hoteis 
 
     def save(self):
         banco.session.add(self)
