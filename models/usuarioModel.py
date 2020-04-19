@@ -23,6 +23,11 @@ class UsuarioModel(banco.Model):
         user = cls.query.filter_by(user_id=user_id).first()
         return user if user else None
 
+    @classmethod
+    def find_by_login(cls, login):
+        user = cls.query.filter_by(login=login).first()
+        return user if user else None
+
     def save(self):
         banco.session.add(self)
         banco.session.commit()
