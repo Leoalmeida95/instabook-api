@@ -1,5 +1,6 @@
 from flask_restful import Resource, reqparse
-from models import HotelModel, usuarioModel
+from models.hotelModel import HotelModel
+from models.usuarioModel import UsuarioModel
 
 class Hoteis(Resource):
 
