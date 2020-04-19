@@ -3,7 +3,7 @@ from models import UsuarioModel
 
 
 class Usuario(Resource):
-
+    #usuario
     def get(self, user_id):
         user = UsuarioModel.find(user_id)
 
