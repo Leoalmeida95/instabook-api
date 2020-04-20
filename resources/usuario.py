@@ -1,7 +1,8 @@
 from flask_restful import Resource, reqparse
 from models.usuarioModel import UsuarioModel
-from flask_jwt_extended import create_access_token, jwt_required
+from flask_jwt_extended import create_access_token, jwt_required, get_raw_jwt
 from werkzeug.security import safe_str_cmp
+from blacklist import BLACKLIST
 
 atributos = reqparse.RequestParser()
 atributos.add_argument('login', type=str, required=True, help='The field "login" cannot be left blank.')
@@ -52,3 +53,12 @@ class UsuarioLogin(Resource):
             return {'access_token': token_acesso}, 200
         
         return {'message': 'User not find.'}, 404
+
+class UsuarioLogout(Resource):
+
+    @classmethod
+    @jwt_required
+    def post(cls):
+        jwt_id = get_raw_jwt()['jti'] # JWT Token Identifier
+        BLACKLIST.add(jwt_id)
+        return {'message': 'Logged out successfully'}, 200
