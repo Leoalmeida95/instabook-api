@@ -1,13 +1,62 @@
 from flask_restful import Resource, reqparse
 from models.hotelModel import HotelModel
 from flask_jwt_extended import jwt_required
+import sqlite3
+
+def normalize_path_params(cidade=None,
+                         estrelas_min=0,
+                         estrelas_max=5,
+                         diaria_min=0,
+                         diaria_max=10000,
+                         limit = 50,
+                         offset = 0, **dados):
+
+    result = {
+            'estrelas_min': estrelas_min,
+            'estrelas_max': estrelas_max,
+            'diarias_min': diaria_min,
+            'diarias_max': diaria_max,
+            'limit': limit,
+            'offset': offset
+        }
+
+    if cidade:
+        result.update(){'cidade' : cidade} 
+
+    return result
+
+
+
+path_params = reqparse.RequestParser()
+path_params.add_argument('cidade', type=str)
+path_params.add_argument('estrelas_min', type=float)
+path_params.add_argument('estrelas_max', type=float)
+path_params.add_argument('diaria_min', type=float)
+path_params.add_argument('diaria_max', type=float)
+path_params.add_argument('offset', type=float)
+path_params.add_argument('limit', type=float)
 
 class Hoteis(Resource):
 
     def get(self):
-        hoteis = HotelModel.find_all()
 
-        return {'hoteis': [ hotel.json() for hotel in hoteis ]}
+        connection = sqlite3.connect('banco.db')
+        cursor = connection.cursor()
+
+        # hoteis = HotelModel.find_all()
+        dados = path_params.parse_args()
+        dados_buscados = {chave: dados[chave] for chave in dados if dados[chave] is not None}
+        parametros = normalize_path_params(**dados_buscados)
+
+        if parametros.get('cidade'):
+            consulta = "SELECT * FROM \
+                                Hoteis \
+                        WHERE (estrelas > ? and estrelas < ?)\
+                              and (diaria > ? and diaria < ?)\
+                        LIMIT ? \
+                        OFFSET ? "
+                        
+        result = cursor.execute(consulta, ()
 
         return {'message': 'No Hotels found.'}, 404
 
