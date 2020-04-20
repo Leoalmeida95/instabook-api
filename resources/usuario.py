@@ -35,7 +35,7 @@ class UsuarioRegistro(Resource):
         dados = atributos.parse_args()
 
         if UsuarioModel.find_by_login(dados['login']):
-            return {'message': 'The login "{}" already exists.'.format(dados['login'])}
+            return {'message': 'The login "{}" already exists.'.format(dados['login'])}, 422
 
         user = UsuarioModel(**dados)
         user.save()
@@ -51,4 +51,4 @@ class UsuarioLogin(Resource):
             token_acesso = create_access_token(identity=user.user_id)
             return {'access_token': token_acesso}, 200
         
-        return {'message': 'User not find.'}, 401
+        return {'message': 'User not find.'}, 404

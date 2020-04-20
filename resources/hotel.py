@@ -9,7 +9,7 @@ class Hoteis(Resource):
 
         return {'hoteis': [ hotel.json() for hotel in hoteis ]}
 
-        return {'message': 'Hotel not found.'}, 404
+        return {'message': 'No Hotels found.'}, 404
 
 class Hotel(Resource):
     argumentos = reqparse.RequestParser()
@@ -63,7 +63,7 @@ class Hotel(Resource):
         if hotel_encontrado:
             try:
                 hotel_encontrado.delete()
-                return {'message': 'Hotel deleted.'}
+                return {'message': 'Hotel deleted.'}, 200
             except:
                 return {'message':'An internal error ocurred trying to delete "hotel".'}, 500
 
