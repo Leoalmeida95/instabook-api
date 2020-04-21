@@ -39,7 +39,8 @@ class Hoteis(Resource):
             'nome': linha[1],
             'estrelas': linha[2],
             'diaria': linha[3],
-            'cidade': linha[4]
+            'cidade': linha[4],
+            'site_id': linha[5]
             })
 
         if hoteis:
@@ -53,6 +54,7 @@ class Hotel(Resource):
     argumentos.add_argument('estrelas', type=float, required=True, help="The field 'estrelas' cannot be left blank.")
     argumentos.add_argument('diaria', type=float, required=True, help="The field 'diaria' cannot be left blank.")
     argumentos.add_argument('cidade', type=str, required=True, help="The field 'cidade' cannot be left blank.")
+    argumentos.add_argument('site_id', type=int, required=True, help="The field 'site_id' cannot be left blank.")
 
     def get(self, id):
         hotel = HotelModel.find(id)
@@ -71,8 +73,8 @@ class Hotel(Resource):
         novo_hotel = HotelModel(id, **dados) #implementando o **kwargs, distribuindo as propriedades de chave e valor pelo objeto
         try:
             novo_hotel.save()
-        except:
-            return {'message':'An internal error ocurred trying to update "hotel".'}, 500
+        except Exception as e:
+            return {"message":"An internal error ocurred trying to save 'hotel'."}, 500
 
         return novo_hotel.json(), 201
 

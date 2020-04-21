@@ -14,7 +14,7 @@ class SiteModel(banco.Model):
         return{
             'id': self.id,
             'url': self.url,
-            'hotis': [hotel.json() for hotel in self.hoteis]
+            'hoteis': [hotel.json() for hotel in self.hoteis]
         }
 
     #cls define que o método é um 'método de classe', portanto não acessa as propriedades self

@@ -24,14 +24,14 @@ def normalize_path_params(cidade=None,
     return result
 
 consulta_padrao = "SELECT * FROM \
-                    Hoteis \
+                    Hotel \
             WHERE (estrelas >= ? and estrelas <= ?)\
                     and (diaria >= ? and diaria <= ?)\
             LIMIT ? \
             OFFSET ? "
     
 consulta_cidade = "SELECT * FROM \
-                    Hoteis \
+                    Hotel \
             WHERE (estrelas >= ? and estrelas <= ?)\
                     and (diaria >= ? and diaria <= ?)\
                     and cidade = ? \

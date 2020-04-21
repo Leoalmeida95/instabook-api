@@ -15,7 +15,7 @@ class HotelModel(banco.Model):
         self.nome = nome
         self.estrelas = estrelas
         self.diaria = diaria
-        self.cidade = cidade,
+        self.cidade = cidade
         self.site_id = site_id
 
     def json(self):
