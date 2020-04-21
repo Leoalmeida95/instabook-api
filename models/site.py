@@ -24,6 +24,11 @@ class SiteModel(banco.Model):
         return site if site else None
 
     @classmethod
+    def find_by_id(cls, id):
+        site = cls.query.filter_by(id=id).first()
+        return site if site else None
+
+    @classmethod
     def find_all(cls):
         sites = cls.query.all()
         return sites 
@@ -33,5 +38,6 @@ class SiteModel(banco.Model):
         banco.session.commit()
 
     def delete(self):
+        [hotel.delete() for hotel in self.hoteis]
         banco.session.delete(self)
         banco.session.commit()

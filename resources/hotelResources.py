@@ -1,5 +1,6 @@
 from flask_restful import Resource, reqparse
 from models.hotel import HotelModel
+from models.site import SiteModel
 from flask_jwt_extended import jwt_required
 from resources.filtrosResources import normalize_path_params, consulta_padrao, consulta_cidade
 import sqlite3
@@ -65,12 +66,16 @@ class Hotel(Resource):
         return {'message': 'Hotel not found.'}, 404
 
     @jwt_required
-    def post(self, id):
+    def post(seidlf, id):
         if HotelModel.find(id):
             return{"message":"Hotel id '{}' already exists.".format(id)}, 400
 
         dados = Hotel.argumentos.parse_args()
         novo_hotel = HotelModel(id, **dados) #implementando o **kwargs, distribuindo as propriedades de chave e valor pelo objeto
+
+        if not SiteModel.find_by_id(novo_hotel.site_id):
+            return{"message": "Site id '{}' not exists.".format(novo_hotel.site_id)}, 400
+
         try:
             novo_hotel.save()
         except Exception as e:
@@ -85,13 +90,13 @@ class Hotel(Resource):
         try:
             if hotel_encontrado:
                 hotel_encontrado.update(**dados)
-                hotel_encontrado.save()
                 return hotel_encontrado.json(), 200
 
             novo_hotel = HotelModel(id, **dados)
             novo_hotel.save()
-        except:
-            return {'message':'An internal error ocurred trying to save "hotel".'}, 500
+        except Exception as e:
+            print (e)
+            return {"message":"An internal error ocurred trying to update 'hotel'."}, 500
 
         return novo_hotel.json(), 201
 
