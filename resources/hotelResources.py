@@ -1,32 +1,10 @@
 from flask_restful import Resource, reqparse
-from models.hotelModel import HotelModel
+from models.hotel import HotelModel
 from flask_jwt_extended import jwt_required
+from resources.filtrosResources import normalize_path_params, consulta_padrao, consulta_cidade
 import sqlite3
 
-def normalize_path_params(cidade=None,
-                         estrelas_min=0,
-                         estrelas_max=5,
-                         diaria_min=0,
-                         diaria_max=10000,
-                         limit = 50,
-                         offset = 0, **dados):
-    result = {
-            'estrelas_min': estrelas_min,
-            'estrelas_max': estrelas_max,
-            'diarias_min': diaria_min,
-            'diarias_max': diaria_max,
-            'cidade': cidade,
-            'limit': limit,
-            'offset': offset
-        }
 
-    if not cidade: 
-    #caso não haja cidade, é removida sem alterar a ordem dos demais parametros
-        copy = dict(result)
-        del copy['cidade']
-        result = copy
-
-    return result
 
 path_params = reqparse.RequestParser()
 path_params.add_argument('cidade', type=str)
@@ -50,24 +28,9 @@ class Hoteis(Resource):
         dados_buscados = {chave: dados[chave] for chave in dados if dados[chave] is not None}
         parametros = normalize_path_params(**dados_buscados)
         tupla = tuple([parametros[chave] for chave in parametros])
-
-        if not parametros.get('cidade'):
-            consulta = "SELECT * FROM \
-                                Hoteis \
-                        WHERE (estrelas >= ? and estrelas <= ?)\
-                              and (diaria >= ? and diaria <= ?)\
-                        LIMIT ? \
-                        OFFSET ? "
-        else:
-            consulta = "SELECT * FROM \
-                                Hoteis \
-                        WHERE (estrelas >= ? and estrelas <= ?)\
-                              and (diaria >= ? and diaria <= ?)\
-                              and cidade = ? \
-                        LIMIT ? \
-                        OFFSET ? "
-                        
-        result = cursor.execute(consulta, tupla)
+   
+        result = cursor.execute(consulta_padrao if not parametros.get('cidade') else consulta_cidade,
+                 tupla)
 
         hoteis = []
         for linha in result:

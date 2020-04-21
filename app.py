@@ -1,7 +1,7 @@
 from flask import Flask, jsonify
 from flask_restful import Api
-from resources.hotel import Hoteis, Hotel
-from resources.usuario import Usuario, UsuarioRegistro, UsuarioLogin, UsuarioLogout
+from resources.hotelResources import Hoteis, Hotel
+from resources.usuarioResources import Usuario, UsuarioRegistro, UsuarioLogin, UsuarioLogout
 from flask_jwt_extended import JWTManager
 from flask_swagger_ui import get_swaggerui_blueprint
 from blacklist import BLACKLIST
