@@ -7,6 +7,7 @@ from blacklist import BLACKLIST
 atributos = reqparse.RequestParser()
 atributos.add_argument('login', type=str, required=True, help='The field "login" cannot be left blank.')
 atributos.add_argument('senha', type=str, required=True, help='The field "senha" cannot be left blank.')
+atributos.add_argument('ativado', type=bool, required=False)
 
 class Usuario(Resource):
     #/usuario/{user_id}
@@ -40,6 +41,7 @@ class UsuarioRegistro(Resource):
 
         user = UsuarioModel(**dados)
         user.save()
+
         return {'message':'User created!'}, 201
 
 class UsuarioLogin(Resource):
@@ -49,8 +51,12 @@ class UsuarioLogin(Resource):
         dados = atributos.parse_args()
         user = UsuarioModel.find_by_login(dados['login'])
         if user and safe_str_cmp(user.senha, dados['senha']):
-            token_acesso = create_access_token(identity=user.user_id)
-            return {'access_token': token_acesso}, 200
+
+            if user.ativado:
+                token_acesso = create_access_token(identity=user.user_id)
+                return {'access_token': token_acesso}, 200
+            else:
+                return {'message': 'User not confirmed.'}, 400
         
         return {'message': 'User not find.'}, 404
 
@@ -62,3 +68,18 @@ class UsuarioLogout(Resource):
         jwt_id = get_raw_jwt()['jti'] # JWT Token Identifier
         BLACKLIST.add(jwt_id)
         return {'message': 'Logged out successfully'}, 200
+
+class UsuarioConfirmacao(Resource):
+
+    @classmethod
+    def get(cls, user_id):
+        user = UsuarioModel.find(user_id)
+        if user:
+            try:
+                user.ativado = True
+                user.save()
+                return {'message': 'User cofirmed!'}, 200
+            except:
+                return {"message":"An internal error ocurred trying to confirme email from 'User'."}, 500
+
+        return {'message': 'User not found.'}, 404
