@@ -2,7 +2,7 @@
   "openapi" : "3.0.0",
   "info" : {
     "title" : "Instabook",
-    "description" : "Documentação da API do Instabook. Informações sobre Hoteis \ne os métodos de Usuários. [http://localhost:5000](http://localhost:5000) \n",
+    "description" : "Documentação da API do Instabook. Informações sobre Sites e seus Hoteis \ne os métodos de Usuários. [http://localhost:5000](http://localhost:5000) \n",
     "contact" : {
       "email" : "leo.almeida.silva@hotmail.com"
     },
@@ -23,35 +23,124 @@
     "url" : "http://localhost:5000"
   } ],
   "tags" : [ {
-    "name" : "hoteis",
-    "description" : "Todos os hoteis do Instabook"
-  }, {
     "name" : "usuario",
     "description" : "Usuários cadastrados na rede"
+  }, {
+    "name" : "site",
+    "description" : "Sites do Instabook"
+  }, {
+    "name" : "hotel",
+    "description" : "Todos os hoteis dos sites"
   } ],
   "paths" : {
     "/hoteis" : {
       "get" : {
-        "tags" : [ "hoteis" ],
+        "tags" : [ "hotel" ],
         "summary" : "Obtém a lista de hoteis do Instabook",
-        "operationId" : "HotelModel.find_all",
+        "operationId" : "Hoteis.get",
+        "parameters" : [ {
+          "name" : "offset",
+          "in" : "query",
+          "description" : "Numero de itens para 'pular' na consulta.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "integer",
+            "default" : 0
+          }
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Numero de linhas para retornar",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "integer",
+            "default" : 50
+          }
+        }, {
+          "name" : "cidade",
+          "in" : "query",
+          "description" : "Nome da cidade",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "default" : "None"
+          }
+        }, {
+          "name" : "estrelas_min",
+          "in" : "query",
+          "description" : "Numero mínimo de estrelas do hotel",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "maximum" : 5,
+            "minimum" : 0,
+            "type" : "integer",
+            "default" : 0
+          }
+        }, {
+          "name" : "estrelas_max",
+          "in" : "query",
+          "description" : "Numero máximo de estrelas do hotel",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "maximum" : 5,
+            "minimum" : 0,
+            "type" : "integer",
+            "default" : 5
+          }
+        }, {
+          "name" : "diarias_min",
+          "in" : "query",
+          "description" : "Valor mínimo da diária do hotel",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "maximum" : 10000,
+            "minimum" : 0,
+            "type" : "integer",
+            "default" : 0
+          }
+        }, {
+          "name" : "diarias_max",
+          "in" : "query",
+          "description" : "Valor máximo da diária do hotel",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "maximum" : 10000,
+            "minimum" : 0,
+            "type" : "integer",
+            "default" : 10000
+          }
+        } ],
         "responses" : {
           "200" : {
             "description" : "successful operation",
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/Hoteis"
+                  "$ref" : "#/components/schemas/Hotel"
                 }
               },
               "application/xml" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/Hoteis"
+                  "$ref" : "#/components/schemas/Hotel"
                 }
               }
             }
           },
-          "404" : {
+          "204" : {
             "description" : "No Hotels found."
           }
         },
@@ -60,14 +149,14 @@
         } ]
       }
     },
-    "/hoteis/{hotel_id}" : {
+    "/hotel/{id}" : {
       "get" : {
-        "tags" : [ "hoteis" ],
+        "tags" : [ "hotel" ],
         "summary" : "Obter Hotel por ID",
         "description" : "Retorna um único Hotel",
-        "operationId" : "HotelModel.find",
+        "operationId" : "Hotel.find",
         "parameters" : [ {
-          "name" : "hotel_id",
+          "name" : "id",
           "in" : "path",
           "description" : "ID do hotel a ser retornado",
           "required" : true,
@@ -84,34 +173,35 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/Hoteis"
+                  "$ref" : "#/components/schemas/Hotel"
                 }
               },
               "application/xml" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/Hoteis"
+                  "$ref" : "#/components/schemas/Hotel"
                 }
               }
             }
           },
+          "204" : {
+            "description" : "Hotel not found."
+          },
           "403" : {
             "description" : "Forbiden."
-          },
-          "404" : {
-            "description" : "Hotel not found."
           }
         },
         "security" : [ {
-          "user_auth" : [ "read/write:hoteis" ]
+          "user_auth" : [ "usuario" ]
         } ]
       },
       "put" : {
-        "tags" : [ "hoteis" ],
+        "tags" : [ "hotel" ],
         "summary" : "Alterar Hotel passando os dados",
-        "operationId" : "HotelModel.put",
+        "operationId" : "Hotel.put",
         "parameters" : [ {
           "name" : "api_key",
           "in" : "header",
+          "description" : "string de autenticação do usuário",
           "required" : true,
           "style" : "simple",
           "explode" : false,
@@ -119,7 +209,7 @@
             "type" : "string"
           }
         }, {
-          "name" : "hotel_id",
+          "name" : "id",
           "in" : "path",
           "description" : "ID do hotel a ser alterado",
           "required" : true,
@@ -145,12 +235,12 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/Hoteis"
+                  "$ref" : "#/components/schemas/Hotel"
                 }
               },
               "application/xml" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/Hoteis"
+                  "$ref" : "#/components/schemas/Hotel"
                 }
               }
             }
@@ -160,12 +250,12 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/Hoteis"
+                  "$ref" : "#/components/schemas/Hotel"
                 }
               },
               "application/xml" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/Hoteis"
+                  "$ref" : "#/components/schemas/Hotel"
                 }
               }
             }
@@ -178,16 +268,17 @@
           }
         },
         "security" : [ {
-          "usuario_auth" : [ "read/write:hoteis" ]
+          "user_auth" : [ "usuario" ]
         } ]
       },
       "delete" : {
-        "tags" : [ "hoteis" ],
+        "tags" : [ "hotel" ],
         "summary" : "Deleta um Hotel",
-        "operationId" : "HotelModel.delete",
+        "operationId" : "Hotel.delete",
         "parameters" : [ {
           "name" : "api_key",
           "in" : "header",
+          "description" : "string de autenticação do usuário",
           "required" : true,
           "style" : "simple",
           "explode" : false,
@@ -195,7 +286,7 @@
             "type" : "string"
           }
         }, {
-          "name" : "hotel_id",
+          "name" : "id",
           "in" : "path",
           "description" : "Id od Hotel a ser deletado",
           "required" : true,
@@ -212,12 +303,12 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/Hoteis"
+                  "$ref" : "#/components/schemas/Hotel"
                 }
               },
               "application/xml" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/Hoteis"
+                  "$ref" : "#/components/schemas/Hotel"
                 }
               }
             }
@@ -233,40 +324,112 @@
           }
         },
         "security" : [ {
-          "usuario_auth" : [ "read/write:hoteis" ]
+          "user_auth" : [ "usuario" ]
         } ]
       }
     },
     "/usuario" : {
       "post" : {
         "tags" : [ "usuario" ],
-        "summary" : "Cria um usuario",
+        "summary" : "Cadastra um usuario",
         "operationId" : "UsuarioRegistro.post",
+        "parameters" : [ {
+          "name" : "login",
+          "in" : "query",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "senha",
+          "in" : "query",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
         "responses" : {
           "201" : {
             "description" : "successful operation",
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/Hoteis"
+                  "$ref" : "#/components/schemas/Usuario"
                 }
               },
               "application/xml" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/Hoteis"
+                  "$ref" : "#/components/schemas/Usuario"
+                }
+              }
+            }
+          },
+          "422" : {
+            "description" : "The login already exists."
+          },
+          "500" : {
+            "description" : "An internal error ocurred trying to delete 'User'."
+          }
+        },
+        "security" : [ {
+          "api_key" : [ ]
+        } ]
+      },
+      "delete" : {
+        "tags" : [ "usuario" ],
+        "summary" : "Deleta um usuario",
+        "operationId" : "Usuario.delete",
+        "parameters" : [ {
+          "name" : "api_key",
+          "in" : "header",
+          "description" : "string de autenticação do usuário",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "id",
+          "in" : "path",
+          "description" : "Id do Usuario a ser deletado",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "integer",
+            "format" : "inintegert"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "deleted successfully",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Usuario"
+                }
+              },
+              "application/xml" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Usuario"
                 }
               }
             }
           },
           "404" : {
-            "description" : "No Hotels found."
+            "description" : "User not found."
           },
-          "422" : {
-            "description" : "The login already exists."
+          "500" : {
+            "description" : "An internal error ocurred trying to delete \"User\"."
           }
         },
         "security" : [ {
-          "api_key" : [ ]
+          "user_auth" : [ "usuario" ]
         } ]
       }
     },
@@ -275,16 +438,30 @@
         "tags" : [ "usuario" ],
         "summary" : "Autentica um usuario",
         "operationId" : "UsuarioLogin.post",
+        "parameters" : [ {
+          "name" : "login",
+          "in" : "query",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "senha",
+          "in" : "query",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
         "responses" : {
           "200" : {
             "description" : "successful operation",
             "content" : {
               "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/ApiResponse"
-                }
-              },
-              "application/xml" : {
                 "schema" : {
                   "$ref" : "#/components/schemas/ApiResponse"
                 }
@@ -302,14 +479,97 @@
           "api_key" : [ ]
         } ]
       }
+    },
+    "/sites" : {
+      "get" : {
+        "tags" : [ "site" ],
+        "summary" : "Obtém a lista de sites do Instabook",
+        "operationId" : "Sites.get",
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Site"
+                }
+              },
+              "application/xml" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Site"
+                }
+              }
+            }
+          },
+          "204" : {
+            "description" : "No Sites found."
+          }
+        },
+        "security" : [ {
+          "user_auth" : [ "usuario" ]
+        } ]
+      }
+    },
+    "/sites/{url}" : {
+      "post" : {
+        "tags" : [ "site" ],
+        "summary" : "Cria um site",
+        "operationId" : "Site.post",
+        "parameters" : [ {
+          "name" : "api_key",
+          "in" : "header",
+          "description" : "string de autenticação do usuário",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "url",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "201" : {
+            "description" : "created successfuly",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Site"
+                }
+              },
+              "application/xml" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Site"
+                }
+              }
+            }
+          },
+          "422" : {
+            "description" : "The site already exists."
+          },
+          "500" : {
+            "description" : "An internal error ocurred trying to save 'site'."
+          }
+        },
+        "security" : [ {
+          "user_auth" : [ "usuario" ]
+        } ]
+      }
     }
   },
   "components" : {
     "schemas" : {
-      "Hoteis" : {
+      "Hotel" : {
         "type" : "object",
         "properties" : {
-          "hotel_id" : {
+          "id" : {
             "type" : "string"
           },
           "nome" : {
@@ -325,6 +585,10 @@
           },
           "cidade" : {
             "type" : "string"
+          },
+          "site_id" : {
+            "type" : "integer",
+            "format" : "integer"
           }
         }
       },
@@ -340,6 +604,24 @@
           },
           "login" : {
             "type" : "string"
+          }
+        }
+      },
+      "Site" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "url" : {
+            "type" : "string"
+          },
+          "hoteis" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/Hotel"
+            }
           }
         }
       },
@@ -378,12 +660,12 @@
         },
         "required" : true
       },
-      "Hoteis" : {
-        "description" : "Hoteis",
+      "Hotel" : {
+        "description" : "Hotel",
         "content" : {
           "application/json" : {
             "schema" : {
-              "$ref" : "#/components/schemas/Hoteis"
+              "$ref" : "#/components/schemas/Hotel"
             }
           }
         },
@@ -408,8 +690,7 @@
           "implicit" : {
             "authorizationUrl" : "http://localhost:5000/usuario/login",
             "scopes" : {
-              "write:usuario" : "modifique seus dados",
-              "read/write:hoteis" : "leia os dados dos hotes"
+              "usuario" : "autenticado com login"
             }
           }
         }

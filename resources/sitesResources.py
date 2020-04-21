@@ -9,7 +9,7 @@ class Sites(Resource):
         if sites:
             return {'sites': [site.json() for site in sites]}, 200
 
-        return {'message': 'No Sites found.'}, 404
+        return {'message': 'No Sites found.'}, 204
 
 class Site(Resource):
     def get(self, url):
@@ -18,7 +18,7 @@ class Site(Resource):
         if site:
             return site.json(), 200
         
-        return {'message': 'Site not found.'}, 404
+        return {'message': 'Site not found.'}, 204
 
     @jwt_required
     def post(self, url):

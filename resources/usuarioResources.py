@@ -14,9 +14,9 @@ class Usuario(Resource):
         user = UsuarioModel.find(user_id)
 
         if user:
-            return user.json()
+            return user.json(), 200
 
-        return {'message': 'User not found.'}, 404
+        return {'message': 'User not found.'}, 204
 
     @jwt_required
     def delete(self, user_id):
@@ -24,7 +24,7 @@ class Usuario(Resource):
         if user:
             try:
                 user.delete()
-                return {'message': 'User deleted.'}
+                return {'message': 'User deleted.'}, 200
             except:
                 return {'message':'An internal error ocurred trying to delete "User".'}, 500
 
