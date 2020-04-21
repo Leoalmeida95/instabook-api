@@ -7,9 +7,8 @@ class SiteModel(banco.Model):
     url = banco.Column(banco.String(80))
     hoteis = banco.relationship('HotelModel')
 
-    def __init__(self, url:
+    def __init__(self, url):
         self.url = url
-
 
     def json(self):
         return{
@@ -23,6 +22,11 @@ class SiteModel(banco.Model):
     def find(cls, url):
         site = cls.query.filter_by(url=url).first()
         return site if site else None
+
+    @classmethod
+    def find_all(cls):
+        sites = cls.query.all()
+        return sites 
 
     def save(self):
         banco.session.add(self)

@@ -2,6 +2,7 @@ from flask import Flask, jsonify
 from flask_restful import Api
 from resources.hotelResources import Hoteis, Hotel
 from resources.usuarioResources import Usuario, UsuarioRegistro, UsuarioLogin, UsuarioLogout
+from resources.sitesResources import Sites, Site
 from flask_jwt_extended import JWTManager
 from flask_swagger_ui import get_swaggerui_blueprint
 from blacklist import BLACKLIST
@@ -42,11 +43,13 @@ def cria_banco():
     banco.create_all()
 
 api.add_resource(Hoteis, '/hoteis')
-api.add_resource(Hotel, '/hoteis/<string:hotel_id>')
+api.add_resource(Hotel, '/hoteis/<string:id>')
 api.add_resource(Usuario, '/usuario/<int:user_id>')
 api.add_resource(UsuarioRegistro, '/usuario/')
 api.add_resource(UsuarioLogin, '/usuario/login')
 api.add_resource(UsuarioLogout, '/usuario/logout')
+api.add_resource(Sites, '/sites')
+api.add_resource(Site, '/sites/<string:url>')
 
 if __name__ == '__main__':
     from sql_alchemy import banco
