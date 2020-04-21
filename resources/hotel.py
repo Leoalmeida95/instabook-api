@@ -10,22 +10,23 @@ def normalize_path_params(cidade=None,
                          diaria_max=10000,
                          limit = 50,
                          offset = 0, **dados):
-
     result = {
             'estrelas_min': estrelas_min,
             'estrelas_max': estrelas_max,
             'diarias_min': diaria_min,
             'diarias_max': diaria_max,
+            'cidade': cidade,
             'limit': limit,
             'offset': offset
         }
 
-    if cidade:
-        result.update(){'cidade' : cidade} 
+    if not cidade: 
+    #caso não haja cidade, é removida sem alterar a ordem dos demais parametros
+        copy = dict(result)
+        del copy['cidade']
+        result = copy
 
     return result
-
-
 
 path_params = reqparse.RequestParser()
 path_params.add_argument('cidade', type=str)
@@ -35,6 +36,7 @@ path_params.add_argument('diaria_min', type=float)
 path_params.add_argument('diaria_max', type=float)
 path_params.add_argument('offset', type=float)
 path_params.add_argument('limit', type=float)
+
 
 class Hoteis(Resource):
 
@@ -47,16 +49,38 @@ class Hoteis(Resource):
         dados = path_params.parse_args()
         dados_buscados = {chave: dados[chave] for chave in dados if dados[chave] is not None}
         parametros = normalize_path_params(**dados_buscados)
+        tupla = tuple([parametros[chave] for chave in parametros])
 
-        if parametros.get('cidade'):
+        if not parametros.get('cidade'):
             consulta = "SELECT * FROM \
                                 Hoteis \
-                        WHERE (estrelas > ? and estrelas < ?)\
-                              and (diaria > ? and diaria < ?)\
+                        WHERE (estrelas >= ? and estrelas <= ?)\
+                              and (diaria >= ? and diaria <= ?)\
+                        LIMIT ? \
+                        OFFSET ? "
+        else:
+            consulta = "SELECT * FROM \
+                                Hoteis \
+                        WHERE (estrelas >= ? and estrelas <= ?)\
+                              and (diaria >= ? and diaria <= ?)\
+                              and cidade = ? \
                         LIMIT ? \
                         OFFSET ? "
                         
-        result = cursor.execute(consulta, ()
+        result = cursor.execute(consulta, tupla)
+
+        hoteis = []
+        for linha in result:
+            hoteis.append({
+            'hotel_id': linha[0],
+            'nome': linha[1],
+            'estrelas': linha[2],
+            'diaria': linha[3],
+            'cidade': linha[4]
+            })
+
+        if hoteis:
+            return {'hoteis': hoteis}
 
         return {'message': 'No Hotels found.'}, 404
 
