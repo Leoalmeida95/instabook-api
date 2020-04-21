@@ -6,18 +6,18 @@ class UsuarioModel(banco.Model):
     user_id = banco.Column(banco.Integer, primary_key=True)
     login = banco.Column(banco.String(40))
     senha = banco.Column(banco.String(40))
-    ativado = banco.Column(banco.Boolean, default=False)
+    # ativado = banco.Column(banco.Boolean, default=False)
 
-    def __init__(self, login, senha, ativado):
+    def __init__(self, login, senha):
         self.login = login
         self.senha = senha
-        self.ativado = ativado
+        # self.ativado = ativado
 
     def json(self):
         return{
             'user_id': self.user_id,
-            'login': self.login,
-            'ativado': self.ativado
+            'login': self.login
+            # 'ativado': self.ativado
         }
 
     #cls define que o método é um 'método de classe', portanto não acessa as propriedades self

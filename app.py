@@ -16,13 +16,13 @@ app.config['JWT_BLACKLIST_ENABLED'] = True
 api = Api(app)
 jwt = JWTManager(app)
 
-SWAGGER_URL = '/swagger'
+SWAGGER_URL = '/api/docs'
 API_URL= '/static/swagger.json'
 SWAGGERUI_BLUEPRINT = get_swaggerui_blueprint(
     SWAGGER_URL,
     API_URL,
     config={
-        'app_name': "Seans-Python-Flask-REST-Boilerplate"
+        'app_name': "Swagger - Instabook"
     }
 )
 app.register_blueprint(SWAGGERUI_BLUEPRINT, url_prefix=SWAGGER_URL)
@@ -45,7 +45,7 @@ def cria_banco():
 
 @app.route('/')
 def hello():
-    return redirect("/swagger", code=302)
+    return redirect("/api/docs", code=302)
 
 api.add_resource(Hoteis, '/hoteis')
 api.add_resource(Hotel, '/hoteis/<string:id>')
@@ -60,6 +60,4 @@ api.add_resource(Site, '/sites/<string:url>')
 if __name__ == '__main__':
     from sql_alchemy import banco
     banco.init_app(app)
-    # Bind to PORT if defined, otherwise default to 5000.
-    port = int(os.environ.get('PORT', 5000))
-    app.run(debug=True,host='0.0.0.0', port=port)
+    app.run(debug=True)
