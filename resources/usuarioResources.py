@@ -16,7 +16,7 @@ class Usuario(Resource):
         if user:
             return user.json(), 200
 
-        return {'message': 'User not found.'}, 204
+        return {'message': 'User not found.'}, 404
 
     @jwt_required
     def delete(self, user_id):

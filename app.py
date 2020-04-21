@@ -6,18 +6,21 @@ from resources.sitesResources import Sites, Site
 from flask_jwt_extended import JWTManager
 from flask_swagger_ui import get_swaggerui_blueprint
 from blacklist import BLACKLIST
+from flask_cors import CORS, cross_origin
 import os
 
 app = Flask(__name__)
+CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///banco.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+app.config['SECRET_KEY'] = True
 app.config['JWT_SECRET_KEY'] = 'DontTellAnyone' #pode ser qualque string
 app.config['JWT_BLACKLIST_ENABLED'] = True
 api = Api(app)
 jwt = JWTManager(app)
 
 SWAGGER_URL = '/api/docs'
-API_URL= '/static/swagger.json'
+API_URL= '/static/swagger-v3.json'
 SWAGGERUI_BLUEPRINT = get_swaggerui_blueprint(
     SWAGGER_URL,
     API_URL,
@@ -44,6 +47,7 @@ def cria_banco():
     banco.create_all()
 
 @app.route('/')
+@cross_origin()
 def hello():
     return redirect("/api/docs", code=302)
 

@@ -47,7 +47,7 @@ class Hoteis(Resource):
         if hoteis:
             return {'hoteis': hoteis}, 200
 
-        return {'message': 'No Hotels found.'}, 204
+        return {'message': 'No Hotels found.'}, 404
 
 class Hotel(Resource):
     argumentos = reqparse.RequestParser()
@@ -63,7 +63,7 @@ class Hotel(Resource):
         if hotel:
             return hotel.json(), 200
 
-        return {'message': 'Hotel not found.'}, 204
+        return {'message': 'Hotel not found.'}, 404
 
     @jwt_required
     def post(seidlf, id):
