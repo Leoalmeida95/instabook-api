@@ -3,11 +3,13 @@ from models.usuario import UsuarioModel
 from flask_jwt_extended import create_access_token, jwt_required, get_raw_jwt
 from werkzeug.security import safe_str_cmp
 from blacklist import BLACKLIST
+import traceback
 
 atributos = reqparse.RequestParser()
 atributos.add_argument('login', type=str, required=True, help='The field "login" cannot be left blank.')
 atributos.add_argument('senha', type=str, required=True, help='The field "senha" cannot be left blank.')
 atributos.add_argument('ativado', type=bool, required=False)
+atributos.add_argument('email', type=str, required=False)
 
 class Usuario(Resource):
     #/usuario/{user_id}
@@ -27,7 +29,7 @@ class Usuario(Resource):
                 user.delete()
                 return {'message': 'User deleted.'}, 200
             except:
-                return {'message':'An internal error ocurred trying to delete "User".'}, 500
+                return {"message":"An internal error ocurred trying to delete 'User'."}, 500
 
         return {'message': 'User not found.'}, 404
 
@@ -36,11 +38,23 @@ class UsuarioRegistro(Resource):
     def post(self):
         dados = atributos.parse_args()
 
+        if not dados['email'] or dados['email'] is None:
+            return {"message": "The field 'email' cannot be left blank."}, 422    
+
+        if UsuarioModel.find_by_email(dados['email']):
+            return {'message': 'The email "{}" already exists.'.format(dados['email'])}, 422
+
         if UsuarioModel.find_by_login(dados['login']):
             return {'message': 'The login "{}" already exists.'.format(dados['login'])}, 422
 
         user = UsuarioModel(**dados)
-        user.save()
+        try:
+            user.save()
+            user.send_confirmacao_email()
+        except:
+            user.delete()
+            traceback.print_exc()
+            return {"message":"An internal error ocurred trying registry 'User'."}, 500
 
         return {'message':'User created!'}, 201
 
