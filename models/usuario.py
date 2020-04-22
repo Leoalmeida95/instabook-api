@@ -1,9 +1,9 @@
 from sql_alchemy import banco
 from flask import request, url_for
 import requests
+#credencias obtidas na conta wofsystem@gmail.com na mailgun
+from credenciais_mailgun import MAIL_GUN_API_KEY, MAILGUN_DOMAIN
 
-MAILGUN_DOMAIN = 'sandbox8bf5f52531f046ef9ef9e05a2c7cffde.mailgun.org'
-MAIL_GUN_API_KEY = '9f146ff4af0ab5c8028f28dba44cc6c0-f135b0f1-b837abf7'
 FORM_TITLE = 'NO-REPLAY'
 FROM_EMAIL = 'no-reply@instabook.com'
 

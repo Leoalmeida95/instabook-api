@@ -14,4 +14,6 @@ __pycache__
 # Ignore all local history of files
 **/.history
 
+## impede de versionar as credencias o MAILGUN
+credenciais_mailgun.py
 # End of https://www.gitignore.io/api/visualstudiocode
